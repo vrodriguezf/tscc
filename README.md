@@ -48,7 +48,19 @@ time during the algorithm execution. See Time of First Fulfillment (TFF) in the 
 for more information about this value.
 
 An example of output file in the context of the experimentation shown in the paper 
-can be found in the file `example_shearer_output.csv`.
+can be found in the file `example_shearer_output.csv`:
+```csv
+type,task,timeOfFirstFulfillment
+ABSENCE,Phase 1 [start],1515857545
+MATCH,Phase 2 [start],1515857615
+ABSENCE,Phase 2 [end],1515857615
+MATCH,Phase 4 [end],1515858045
+ABSENCE,Phase 3 [start],1515857615
+MATCH,Phase 1 [end],1515857595
+MATCH,Phase 3 [end],1515857635
+MATCH,Phase 4 not present,1515861285
+ABSENCE,Phase 4 [start],1515857635
+```
 
 **NOTE:** This output is not associated to the input `example_shearer_input.csv`.
 
