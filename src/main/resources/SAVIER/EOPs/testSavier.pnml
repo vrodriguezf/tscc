@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml>
+  <net id="n0">
+    <name>
+      <text>TestSavier</text>
+    </name>
+    <import>
+      <text>import MBPFE.Alert;
+import MBPFE.AlertResponse;
+import MBPFE.queries.SAVIER.*;
+import MBPFE.workflow.TokenEvaluator;</text>
+    </import>
+    <place id="p1">
+      <graphics>
+        <position x="555" y="95"/>
+      </graphics>
+      <name>
+        <text>p1</text>
+        <graphics>
+          <offset x="50" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <place id="p2">
+      <graphics>
+        <position x="555" y="305"/>
+      </graphics>
+      <name>
+        <text>p2</text>
+        <graphics>
+          <offset x="50" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <arc id="i4_p1_t3" source="p1" target="t3">
+      <expression>
+        <text>getTokenSet().size()&gt;0</text>
+      </expression>
+      <expression>
+        <text>currentCase = getTokenSet().get(0)</text>
+      </expression>
+      <graphics>
+        <position x="555" y="121"/>
+        <position x="555" y="190"/>
+      </graphics>
+    </arc>
+    <arc id="o5_t3_p2" source="t3" target="p2">
+      <expression>
+        <text>currentCase</text>
+      </expression>
+      <graphics>
+        <position x="555" y="200"/>
+        <position x="555" y="279"/>
+      </graphics>
+    </arc>
+    <transition id="t3">
+      <graphics>
+        <position x="555" y="195"/>
+      </graphics>
+      <name>
+        <text>t3</text>
+        <graphics>
+          <offset x="50" y="0"/>
+        </graphics>
+      </name>
+      <guard>
+        <text>return true;</text>
+      </guard>
+      <execution>
+        <text>currentCase = new Token(currentCase.getObject(),currentCase.getTimestamp())</text>
+      </execution>
+    </transition>
+  </net>
+</pnml>
