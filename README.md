@@ -10,7 +10,7 @@ a docker container such as [this one](https://github.com/carlossg/docker-maven/b
 
 ## Build an executable JAR file
 1. Open a terminal and go to the root folder of the project.
-2. Run `mvn package`
+2. Run `mvn assembly:assembly`
 
 The executable JAR file is `target/tscc-1.0-SNAPSHOT-jar-with-dependencies.jar`. 
 

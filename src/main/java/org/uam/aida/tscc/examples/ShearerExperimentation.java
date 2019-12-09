@@ -36,7 +36,9 @@ import org.uam.aida.tscc.APFE.timeseries_guards.UnivariateTSG;
 import org.uam.aida.tscc.APFE.timeseries_guards.TSG;
 import org.uam.aida.tscc.APFE.utils.Pair;
 import org.uam.aida.tscc.business.Global;
+import org.uam.aida.tscc.business.NetClass;
 import org.uam.aida.tscc.business.Transition;
+import org.uam.aida.tscc.data.FileManager;
 
 /**
  *
@@ -86,7 +88,19 @@ public class ShearerExperimentation {
         Toml config = new Toml().read(Files.newInputStream(Paths.get(args[2])));
 
         //Load the corresponding TSWFNet (from package OP_models)
-        TSWFNet W = new SHEERER_SINGLE_CYCLE();
+        //TSWFNet W = new SHEERER_SINGLE_CYCLE();
+        FileManager handler = new FileManager();
+        NetClass n = new NetClass();
+        handler.loadFile(new File("/home/victor/Desktop/sheerer_single_cycle_extended_2.pnml"));
+        String netCode = n.generateNetSource();
+        Files.write(Paths.get("/home/victor/Git/Github/tscc/src/main/java/org/uam/aida/tscc/OP_models/SHEERER_SINGLE_CYCLE.java"), netCode.getBytes());
+        TSWFNet W;
+        try {
+            W = (TSWFNet) Class.forName("org.uam.aida.tscc.OP_models.SHEERER_SINGLE_CYCLE").newInstance();
+        } catch (Exception ex) {
+            Logger.getLogger(ShearerExperimentation.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
 
         //Time to start the conformance checking
         //(Earliest timestamp in the log)

@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Desktop/tmp.csv /home/victor/Desktop/tscc_output.csv /home/victor/Desktop/config_ccts_2.toml</exec.args>
+                <exec.args>-classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Downloads/shearer_input.csv /home/victor/Downloads/shearer_tests_output.csv /home/victor/Downloads/config_ccts.toml</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Desktop/tmp.csv /home/victor/Desktop/tscc_output.csv /home/victor/Desktop/config_ccts_2.toml</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Downloads/shearer_input.csv /home/victor/Downloads/shearer_tests_output.csv /home/victor/Downloads/config_ccts.toml</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Desktop/tmp.csv /home/victor/Desktop/tscc_output.csv /home/victor/Desktop/config_ccts_2.toml</exec.args>
+                <exec.args>-classpath %classpath org.uam.aida.tscc.examples.ShearerExperimentation /home/victor/Downloads/shearer_input.csv /home/victor/Downloads/shearer_tests_output.csv /home/victor/Downloads/config_ccts.toml</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
