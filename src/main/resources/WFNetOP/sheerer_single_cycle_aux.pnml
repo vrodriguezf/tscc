@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml>
+  <net id="n0">
+    <name>
+      <text>SHEERER_SINGLE_CYCLE</text>
+    </name>
+    <import>
+      <text>package OP_models.sheerer;
+
+import java.util.Collections;
+import java.util.stream.Stream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;</text>
+    </import>
+    <arc id="o11_t6_p3" source="t6" target="p3">
+      <expression>
+        <text>currentCase.getObject()@currentCase.getTimestamp()</text>
+      </expression>
+      <graphics>
+        <position x="75" y="230"/>
+        <position x="75" y="249"/>
+      </graphics>
+    </arc>
+    <place id="p1">
+      <graphics>
+        <position x="75" y="75"/>
+      </graphics>
+      <name>
+        <text>Phase 1: Location increases</text>
+        <graphics>
+          <offset x="130" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <transition id="t5">
+      <graphics>
+        <position x="75" y="125"/>
+      </graphics>
+      <name>
+        <text>Phase 1 ends</text>
+        <graphics>
+          <offset x="80" y="0"/>
+        </graphics>
+      </name>
+      <guard>
+        <text>return true;</text>
+      </guard>
+      <execution>
+        <text>currentCase = new Token(currentCase.getObject(),currentCase.getTimestamp())</text>
+      </execution>
+      <guardcondition>
+        <text>new TrivialGuardCondition()</text>
+      </guardcondition>
+      <timescope x1="0" x2="3"/>
+    </transition>
+    <place id="p2">
+      <graphics>
+        <position x="75" y="175"/>
+      </graphics>
+      <name>
+        <text>Phase 2: Location remains constant</text>
+        <graphics>
+          <offset x="160" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <transition id="t6">
+      <graphics>
+        <position x="75" y="225"/>
+      </graphics>
+      <name>
+        <text>Phase 2 ends</text>
+        <graphics>
+          <offset x="80" y="0"/>
+        </graphics>
+      </name>
+      <guard>
+        <text>return true;</text>
+      </guard>
+      <execution>
+        <text>currentCase = new Token(currentCase.getObject(),currentCase.getTimestamp())</text>
+      </execution>
+      <guardcondition>
+        <text>new TrivialGuardCondition()</text>
+      </guardcondition>
+      <timescope x1="0" x2="0"/>
+    </transition>
+    <place id="p3">
+      <graphics>
+        <position x="75" y="275"/>
+      </graphics>
+      <name>
+        <text>Phase 3: Location decreases</text>
+        <graphics>
+          <offset x="140" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <transition id="t7">
+      <graphics>
+        <position x="75" y="325"/>
+      </graphics>
+      <name>
+        <text>Phase 3 ends</text>
+        <graphics>
+          <offset x="80" y="0"/>
+        </graphics>
+      </name>
+      <guard>
+        <text>return true;</text>
+      </guard>
+      <execution>
+        <text>currentCase = new Token(currentCase.getObject(),currentCase.getTimestamp())</text>
+      </execution>
+      <guardcondition>
+        <text>new TrivialGuardCondition()</text>
+      </guardcondition>
+      <timescope x1="0" x2="0"/>
+    </transition>
+    <place id="p4">
+      <graphics>
+        <position x="75" y="375"/>
+      </graphics>
+      <name>
+        <text>Phase 4: Location highly increases</text>
+        <graphics>
+          <offset x="160" y="0"/>
+        </graphics>
+      </name>
+    </place>
+    <arc id="i12_p3_t7" source="p3" target="t7">
+      <expression>
+        <text>getTokenSet().size()&gt;0</text>
+      </expression>
+      <expression>
+        <text>currentCase = getTokenSet().get(0)</text>
+      </expression>
+      <graphics>
+        <position x="75" y="301"/>
+        <position x="75" y="320"/>
+      </graphics>
+    </arc>
+    <place id="p15">
+      <graphics>
+        <position x="75" y="475"/>
+      </graphics>
+      <name>
+        <text>pe</text>
+        <graphics>
+          <offset x="48" y="-1"/>
+        </graphics>
+      </name>
+    </place>
+    <arc id="o9_t5_p2" source="t5" target="p2">
+      <expression>
+        <text>currentCase.getObject()@currentCase.getTimestamp()</text>
+      </expression>
+      <graphics>
+        <position x="75" y="130"/>
+        <position x="75" y="149"/>
+      </graphics>
+    </arc>
+    <transition id="t14">
+      <graphics>
+        <position x="75" y="425"/>
+      </graphics>
+      <name>
+        <text>Phase 4 ends</text>
+        <graphics>
+          <offset x="80" y="0"/>
+        </graphics>
+      </name>
+      <guard>
+        <text>return true;</text>
+      </guard>
+      <execution>
+        <text>currentCase = new Token(currentCase.getObject(),currentCase.getTimestamp())</text>
+      </execution>
+      <guardcondition>
+        <text>new TrivialGuardCondition()</text>
+      </guardcondition>
+      <timescope x1="0" x2="0"/>
+    </transition>
+    <arc id="i10_p2_t6" source="p2" target="t6">
+      <expression>
+        <text>getTokenSet().size()&gt;0</text>
+      </expression>
+      <expression>
+        <text>currentCase = getTokenSet().get(0)</text>
+      </expression>
+      <graphics>
+        <position x="75" y="201"/>
+        <position x="75" y="220"/>
+      </graphics>
+    </arc>
+    <arc id="o13_t7_p4" source="t7" target="p4">
+      <expression>
+        <text>currentCase.getObject()@currentCase.getTimestamp()</text>
+      </expression>
+      <graphics>
+        <position x="75" y="330"/>
+        <position x="75" y="349"/>
+      </graphics>
+    </arc>
+    <arc id="o17_t14_p15" source="t14" target="p15">
+      <expression>
+        <text>currentCase.getObject()@currentCase.getTimestamp()</text>
+      </expression>
+      <graphics>
+        <position x="75" y="430"/>
+        <position x="75" y="449"/>
+      </graphics>
+    </arc>
+    <arc id="i8_p1_t5" source="p1" target="t5">
+      <expression>
+        <text>getTokenSet().size()&gt;0</text>
+      </expression>
+      <expression>
+        <text>currentCase = getTokenSet().get(0)</text>
+      </expression>
+      <graphics>
+        <position x="75" y="101"/>
+        <position x="75" y="120"/>
+      </graphics>
+    </arc>
+    <arc id="i16_p4_t14" source="p4" target="t14">
+      <expression>
+        <text>getTokenSet().size()&gt;0</text>
+      </expression>
+      <expression>
+        <text>currentCase = getTokenSet().get(0)</text>
+      </expression>
+      <graphics>
+        <position x="75" y="401"/>
+        <position x="75" y="420"/>
+      </graphics>
+    </arc>
+  </net>
+</pnml>

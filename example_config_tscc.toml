@@ -1,0 +1,165 @@
+# This is a TOML document.
+title = "Configuration file for CCTS (Conformace Checking for Time Series)"
+reversing_time = 500
+automatic_time_scope = true
+#This parameter assigns the granularity automatically based on the maximum
+#number of points desired. The granularity is computed as
+# (length(timeSeries)/automatic_granularity_max_points)
+automatic_granularity_max_points = 1000 
+
+#These properties are applied to every transition in the process model
+[transitions]
+#time_scope = [0, 100000]
+
+#These properties are applied to every TSG of class in the process model (only to univariate TSGs)
+[TSG]
+min_fulfillment_duration = 60
+max_unfulfillment_percentage = 0.02
+epsilon = 0.0
+granularity = 10 #This parameters overrides the parameter automatic_granularity_max_points
+
+# Configuration of every activity of the process model
+[processModel]
+class_name = "SHEERER_SINGLE_CYCLE"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 1 [start]"
+        
+        [processModel.activities.transition]
+        id = "t18"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            description = "Location starts increasing"
+            strict = true
+            event_type = "START"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 1 [end]"
+        
+        [processModel.activities.transition]
+        id = "t5"
+        time_scope = [0, 10000]
+
+            [processModel.activities.transition.tsg]
+            class = "ORTSG"
+            
+                [[processModel.activities.transition.tsg.parts]]
+                description = "Location stops increasing"
+                strict = false
+                event_type = "START"
+                
+                [[processModel.activities.transition.tsg.parts]]
+                description = "Location value keeps greater than 40 meters"
+                value = 40.0
+                strict = true
+                
+                #[[processModel.activities.transition.tsg.parts]]
+                #description = "Location value keeps less or equal than 40 meters"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 2 [start]"
+        
+        [processModel.activities.transition]
+        id = "t25"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            description = "Location starts being constant"
+            epsilon = 3.0
+            
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 2 [end]"
+        
+        [processModel.activities.transition]
+        id = "t6"
+        time_scope = [0, 10000]
+
+            [processModel.activities.transition.tsg]
+            description = "Location stops being constant"            
+            epsilon = 3.0
+            event_type = "START"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 3 [start]"
+        
+        [processModel.activities.transition]
+        id = "t32"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            description = "Location starts decreasing"
+            strict = true
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 3 [end]"
+        
+        [processModel.activities.transition]
+        id = "t7"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            description = "Location stops decreasing"
+            strict = false
+            event_type = "START"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 4 [start]"
+        
+        [processModel.activities.transition]
+        id = "t19"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            class = "ANDTSG"
+            
+                [[processModel.activities.transition.tsg.parts]]
+                class = "VariableIncreasingTSG"
+                description = "Location starts increasing"
+                strict = true
+                
+                [[processModel.activities.transition.tsg.parts]]
+                class = "GreaterThanTSG"
+                description = "Location is higher than 40 meters"
+            
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 4 [end]"
+        
+        [processModel.activities.transition]
+        id = "t14"
+        time_scope = [0, 10000]
+
+            [processModel.activities.transition.tsg]
+            description = "Location stops increasing"
+            strict = false
+            min_fulfillment_duration = 180
+            event_type = "END"
+
+    [[processModel.activities]]
+    type = "task"
+    name = "Phase 4 not present"
+        
+        [processModel.activities.transition]
+        id = "t34"
+        time_scope = [0, 10000]
+        
+            [processModel.activities.transition.tsg]
+            class = "ANDTSG"
+        
+                [[processModel.activities.transition.tsg.parts]]
+                description = "Location does not increase"
+                min_fulfillment_duration = 900
+                strict = false
+                
+                [[processModel.activities.transition.tsg.parts]]
+                description = "Location is less than 40 meters"
+                min_fulfillment_duration = 900
+                strict = true

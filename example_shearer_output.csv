@@ -1,0 +1,10 @@
+type,task,timeOfFirstFulfillment
+ABSENCE,Phase 1 [end],1515857545
+ABSENCE,Phase 4 [end],1515857545
+ABSENCE,Phase 2 [end],1515857545
+ABSENCE,Phase 3 [start],1515857545
+ABSENCE,Phase 4 not present,1515857545
+ABSENCE,Phase 2 [start],1515857545
+ABSENCE,Phase 3 [end],1515857545
+ABSENCE,Phase 1 [start],1515857545
+ABSENCE,Phase 4 [start],1515857545
