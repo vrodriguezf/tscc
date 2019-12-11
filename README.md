@@ -73,5 +73,3 @@ the experimentation of the article.
 Note that, apart from being able to establish the configuration of all the time 
 series guards under the tag `[TSG]`, one can override the specific configuration 
 of one single TSG under the tag `[processModel.activities.transition.tsg]`.
-
-## Create your own process model
