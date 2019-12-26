@@ -21,7 +21,7 @@ the experimentation of the article:
 ## Execution
 The command to execute the time series-aware conformance checking algorithm is:
 ```
-java -jar target `target/tscc-1.0-SNAPSHOT-jar-with-dependencies.jar` [INPUT_FILEPATH.csv]
+java -jar target `target/tscc-1.0-SNAPSHOT-jar-with-dependencies.jar` [INPUT_FILEPATH.csv] [MODEL_FILEPATH.pnml]
 [OUTPUT_FILEPATH.csv] [CONFIG_FILEPATH.toml]
 ```
 
@@ -36,6 +36,13 @@ An example of input file can be found in the file `example_shearer_input.csv`.
 **NOTE:** The data shown in this file does not represent the experimentation data used
 in the the paper, nor the names of the variables. The real data has not been published 
 due to a confidential agreement.
+
+### Model file
+The description of the process model is given as a [Petri Net Markup Language (PNML)](http://www.pnml.org/)
+file. See the section `Creating your own process model` to see how to create a process model
+for your needs.
+
+An example of model file can be found in the file `example_shearer_model.pnml`.
 
 ### Output file
 The output of TSCC is a CSV file where every row represents the evaluation of a 
@@ -73,3 +80,40 @@ the experimentation of the article.
 Note that, apart from being able to establish the configuration of all the time 
 series guards under the tag `[TSG]`, one can override the specific configuration 
 of one single TSG under the tag `[processModel.activities.transition.tsg]`.
+
+## Creating your own process model
+
+The GUI for creating process models is based on the [PetriNetSim](https://github.com/zamzam/PetriNetSim)repository.
+
+1. Open the project with [Netbeans IDE](https://netbeans.org/).
+2. Choose the run configuration ``GUI`` and press Run (green button). You will 
+be prompted an interface for designing your TSWF-Net.
+
+![asd](https://i.imgur.com/QvizSPb.png)
+
+3.  Right-click anywhere in the interface and set a name for you net within the 
+text box `Label`.
+![asd](https://i.imgur.com/8Fb35Er.png)
+
+For more details about how to add places, transitions and arcs to your net see [this article](https://upcommons.upc.edu/bitstream/handle/2099.1/8965/Memoria.pdf?sequence=1&isAllowed=y).
+NOTE: The article is not in English.
+
+4. To add time scopes and time series guards to the transitions of the net, right-click
+on a transition an go to the `TSWF-Net` tab.
+![asd](https://i.imgur.com/i1116Bq.png)
+
+5. Time series guards are Java classes that extend the abstract class `TSG`, found 
+in `src/main/java/org/uam/aida/tscc/APFE/timeseries_guards`. That folder contains also
+a list of already implemented time series guards, for checking common conditions such as:
+    * `=, !=, >, <, <=, >=`
+    * Monotonicity: Increasing/Decreasing/Constant values.
+    * Composition of atomic time series guards: `AND, OR, NOT`.
+*NOTE*: All the currently implemented time series guards extend from the class `UnivariateTSG`, so they 
+can only be used to check conditions over one variable of the time series log. If one would want
+to check several variables at once, a `ComposedTSG` (e.g., `AND`) should be used.
+
+6. When the TSWF-Net is finished, save it as a `.pnml` file.
+
+7. Now you can use the PNML model as an argument of the call to the TSCC algorithm 
+(See the *Execution* section of this README). If there is any error in the code of
+any of the TSGs, they will be prompted when executing the algorithm.

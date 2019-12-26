@@ -11,9 +11,9 @@ import java.io.BufferedWriter;
 import org.uam.aida.tscc.APFE.Evaluation;
 import org.uam.aida.tscc.APFE.TSWFnet.TSWFNet;
 import org.uam.aida.tscc.APFE.time_series_log.LogEntry;
-import org.uam.aida.tscc.OP_models.sheerer.SHEERER_SINGLE_CYCLE;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,8 +31,6 @@ import org.uam.aida.tscc.APFE.evaluation.ConformanceFunction;
 import org.uam.aida.tscc.APFE.time_series_log.IndexedTSLog;
 import org.uam.aida.tscc.APFE.timeseries_guards.ComposedTSG;
 import org.uam.aida.tscc.APFE.timeseries_guards.CountinuousConditionTSG;
-import org.uam.aida.tscc.APFE.timeseries_guards.MonotonicTSG;
-import org.uam.aida.tscc.APFE.timeseries_guards.UnivariateTSG;
 import org.uam.aida.tscc.APFE.timeseries_guards.TSG;
 import org.uam.aida.tscc.APFE.utils.Pair;
 import org.uam.aida.tscc.business.Global;
@@ -57,46 +55,48 @@ public class ShearerExperimentation {
         Long data_log_record_frequency = 0L; //milliseconds
 
         // Error control for command line arguments
-        if (args.length != 3) {
+        if (args.length != 4) {
             LOG.log(Level.SEVERE,
                     "Wrong number of command line arguments (Correct is {0})",
                     new Object[]{3});
-            throw new IllegalArgumentException("Wrong call to the main program");
+            throw new IllegalArgumentException("Wrong call to the main program: java -jar target `target/tscc-1.0-SNAPSHOT-jar-with-dependencies.jar` [INPUT_FILEPATH.csv] [MODEL_FILEPATH.pnml] [OUTPUT_FILEPATH.csv] [CONFIG_FILEPATH.toml]");
         }
+        String input_arg = Paths.get(args[0]).normalize().toAbsolutePath().toString();
+        String model_arg = args[1];
+        String output_arg = args[2];
+        String config_arg = args[3];
 
         //Read the data log
         LOG.log(Level.INFO, "Loading Data log: {0}", args[0]);
-        /*
-        TimeSeriesLog Delta = TimeSeriesLog.loadFromXLSX(
-                args[0],
-                "Sheet1",
-                "time_index",
-                "variable",
-                "value");
-        */
+        
         IndexedTSLog L = IndexedTSLog.loadFromCSV(
-                args[0], 
+                input_arg, 
                 "time_index", 
                 "variable", 
                 "value"
         );
         
         LOG.log(Level.INFO, "Data log successfully loaded");
+        LOG.log(Level.INFO, L.timeIndices().size() + " asdasd");
         
         //Read the config file
-        LOG.log(Level.INFO, "Reading configuration file: {0}", args[2]);
-        Toml config = new Toml().read(Files.newInputStream(Paths.get(args[2])));
+        LOG.log(Level.INFO, "Reading configuration file: {0}", config_arg);
+        Toml config = new Toml().read(Files.newInputStream(Paths.get(config_arg)));
 
-        //Load the corresponding TSWFNet (from package OP_models)
-        //TSWFNet W = new SHEERER_SINGLE_CYCLE();
+        //Compile & Load the corresponding TSWFNet
         FileManager handler = new FileManager();
         NetClass n = new NetClass();
-        handler.loadFile(new File("/home/victor/Desktop/sheerer_single_cycle_extended_2.pnml"));
+        //handler.loadFile(new File("/home/victor/Desktop/sheerer_single_cycle_extended_2.pnml"));
+        handler.loadFile(new File(model_arg));
+        Global.petriNet.setLabel("TMP");
         String netCode = n.generateNetSource();
-        Files.write(Paths.get("/home/victor/Git/Github/tscc/src/main/java/org/uam/aida/tscc/OP_models/SHEERER_SINGLE_CYCLE.java"), netCode.getBytes());
+        Path root = Paths.get(".").normalize().toAbsolutePath();
+        Path tmp_filepath = Paths.get(root.toString(), "src", "main", "java", "org", "uam", "aida", "tscc", "OP_models", "TMP.java");
+        LOG.log(Level.INFO, tmp_filepath.toString());
+        Files.write(tmp_filepath, netCode.getBytes());
         TSWFNet W;
         try {
-            W = (TSWFNet) Class.forName("org.uam.aida.tscc.OP_models.SHEERER_SINGLE_CYCLE").newInstance();
+            W = (TSWFNet) Class.forName("org.uam.aida.tscc.OP_models.TMP").newInstance();
         } catch (Exception ex) {
             Logger.getLogger(ShearerExperimentation.class.getName()).log(Level.SEVERE, null, ex);
             return;
@@ -223,41 +223,6 @@ public class ShearerExperimentation {
                 });
         });
         
-        //Monotonic TSGs (deprectaed)
-        /*
-        Optional<Toml> configTable = Optional.ofNullable(
-                config.getTable("monotonicTSG")
-        );
-        
-        Optional<Long> minFulfillmentDuration = configTable
-                .flatMap(x -> Optional.ofNullable(x.getLong("min_fulfillment_duration")));
-        Optional<Double> epsilon = configTable
-                .flatMap(x -> Optional.ofNullable(x.getDouble("epsilon")));
-        Optional<Long> granularity = configTable
-                .flatMap(x -> Optional.ofNullable(x.getLong("granularity")));
-        Optional<Double> maxUnfulfillmentPercentage = configTable
-                .flatMap(x -> Optional.ofNullable(x.getDouble("max_unfulfillment_percentage")));
-        
-        W.getTransitions()
-                .stream()
-                .map(Transition::getTimeSeriesGuard)
-                .flatMap((TSG tsg) -> {
-                    if (tsg instanceof ComposedTSG) {
-                        return ((ComposedTSG) tsg).flatten().stream();
-                    } else {
-                        return Stream.of(tsg);
-                    }
-                })
-                .filter(x -> x instanceof MonotonicTSG)
-                .map(x -> (MonotonicTSG) x)
-                .forEach(x -> {
-                    minFulfillmentDuration.ifPresent(value -> x.setMinFulfillmentDuration(value));
-                    maxUnfulfillmentPercentage.ifPresent(value -> x.setMaxUnfulfillmentPercentage(value));
-                    epsilon.ifPresent(value -> x.setEpsilon(value));
-                    granularity.ifPresent(value -> x.setGranularity(value));
-                });
-        */
-        
         /**
          * Process model configuration
          */
@@ -279,7 +244,7 @@ public class ShearerExperimentation {
                 W.createInitialMarking(new Long[]{x_0})
             );
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error executing CC algorithm");
+            LOG.log(Level.SEVERE, "Error executing TSCC algorithm");
             e.printStackTrace();
             return;
         }
@@ -298,7 +263,7 @@ public class ShearerExperimentation {
         //Save the results into a CSV file
         if (args.length >= 2) {
             try {
-                BufferedWriter writer = Files.newBufferedWriter(Paths.get(args[1]));
+                BufferedWriter writer = Files.newBufferedWriter(Paths.get(output_arg));
                 CSVPrinter csvPrinter = new CSVPrinter(
                         writer,
                         CSVFormat.DEFAULT.withHeader(
