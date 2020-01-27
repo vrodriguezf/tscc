@@ -136,3 +136,38 @@ remarkable that, regardless the log size, the computational time is stable for
 process models with less than 100 tasks, which are the most common in realistic 
 environments. This experiment has been run on a machine with a Intel Core 
 i5-4670K 3.4GHz (4 cores), 8GB RAM, running Windows 10 x64 and Java 1.8.
+
+To run an scalability experiment, following the steps below:
+
+1. Open the project with [Netbeans IDE](https://netbeans.org/).
+2. In the Projects panel, right-click on the project `tscc` and click on 
+`Project properties`.
+3. In the project properties window, go to `Build->Run` and select the configuration
+`Scalability` on the drop-down menu.
+4. Specify the arguments you want for the scalability test:
+    1. Minimum size of the synthetic log.
+    2. Step in the definition of the log size for the creation of 
+        subsequent synthetic logs.
+    3. Maximum size of the synthetic log.
+    4. Minimum number of tasks to create in the synthetic process model.
+    5. Step in the definition of the number of tasks for the creation of 
+        subsequent synthetic process model.
+    6. Maximum number of tasks to create the synthetic process model.
+    7. Output file path (`CSV` file).
+
+As an example, with the arguments `10000 10000 100000 5 5 500`, the program will
+run the algorithm first with a log of 10000 records and a process model of 5 tasks,
+next with a log of 10000 records and a process model of 10 tasks, and it will end
+after some iterations running the algorithm against a log of 100000 records and 
+500 tasks.
+
+The output file will contain 3 columns with no names:
+1. Log size.
+2. Number of tasks in the process model.
+3. Computational time.
+
+That information can be used to plot figures such as the one shown above.
+
+NOTE: In case one wants to modify the way the synthetic models/logs are created, the
+corresponding Java classes are `org.uam.aida.tscc.APFE.time_series_log.SyntheticIndexedLog` and
+`org.uam.aida.tscc.APFE.TSWFnet`.

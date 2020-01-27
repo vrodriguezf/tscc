@@ -3,158 +3,105 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package examples;
+package org.uam.aida.tscc.examples;
 
-import org.uam.aida.tscc.APFE.OPTriggering;
-import org.uam.aida.tscc.APFE.OPResponse;
-import org.uam.aida.tscc.APFE.Evaluation;
-import SAVIER_integration.SAVIEROperation;
-import SAVIER_integration.SAVIEROperator;
-import examples.SAVIERIntegration;
-import org.uam.aida.tscc.APFE.TSWFnet.DummyOP;
-import org.uam.aida.tscc.APFE.TSWFnet.TSWFNet;
-import org.uam.aida.tscc.APFE.TSWFnet.MarkingOld;
-import SAVIER_integration.data_log.STANAG4586.STANAG4586Log;
-import SAVIER_integration.input.SAVIERInputManager;
-import org.uam.aida.tscc.business.Global;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import de.siegmar.fastcsv.writer.CsvWriter;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import org.uam.aida.tscc.APFE.Evaluation;
+import org.uam.aida.tscc.APFE.TSWFnet.SyntheticTSWFNet;
+import org.uam.aida.tscc.APFE.evaluation.ConformanceFunction;
+import org.uam.aida.tscc.APFE.time_series_log.SyntheticIndexedLog;
 import org.uam.aida.tscc.APFE.utils.Pair;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
  * @author victor
  */
 public class TSCC_Scalability {
-    
-    private static final Logger LOG = Logger.getLogger(SAVIERIntegration.class.getName());
 
+    private static final Logger LOG = Logger.getLogger(TSCC_Scalability.class.getName());
+    
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) {
+        if (args.length == 0 || args.length > 6) {
+            LOG.log(Level.SEVERE, "Argument mismatch. Re-execute the program with the correct arguments");
+        }
+        
+        Integer minLogSize = Integer.valueOf(args[0]);
+        Integer stepLogSize = Integer.valueOf(args[1]);
+        Integer maxLogSize = Integer.valueOf(args[2]);
+        Integer minTasks= Integer.valueOf(args[3]);
+        Integer stepTasks= Integer.valueOf(args[4]);
+        Integer maxTasks = Integer.valueOf(args[5]);
+        
+        // Data structure for results
+        Map<Pair<Integer,Integer>, Long> time_results = new HashMap<>();
+        
+        for (int ntasks = minTasks; ntasks <= maxTasks; ntasks += stepTasks) {
+            
+            //Generate synthetic process model
+            SyntheticTSWFNet model = new SyntheticTSWFNet(ntasks);
+            
+            for (int logSize = minLogSize; logSize <= maxLogSize; logSize += stepLogSize) {
                 
-        if (args.length == 0 || args.length > 4) {
-            LOG.log(Level.SEVERE, "Argument mismatch. Re-execute the program with the corret arguments");
-        }
-        String input_file_path = args[0];
-        Integer min_nsteps = Integer.valueOf(args[1]);
-        Integer max_nsteps = Integer.valueOf(args[2]);
-        String output_file_path = args[3];
-        
-        //Result
-        List<Pair<Integer,Long>> time_results = new ArrayList<Pair<Integer,Long>>();
-        
-        //Try to load the log file
-        STANAG4586Log log = null;
-        LOG.log(Level.INFO, "*** READING LOGS ***");
-        try {
-            //Prueba : cargar un fichero .xlsx de log
-            log = SAVIERInputManager.loadLogFile(input_file_path);
-        } catch (IOException ex) {
-            Logger.getLogger(SAVIERIntegration.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        LOG.log(Level.INFO, "*** DONE ****");
-        Integer logsize = log.getMessages("Sheet1").size();
-        
-        /**
-         * LOOP
-         */
-        for (int nsteps = min_nsteps; nsteps <= max_nsteps; nsteps++) {
-            
-            //Create the operation object (The id is extracted from the log file path)
-            SAVIEROperation operation = new SAVIEROperation(
-                    "dummyOperation",
-                    log,
-                    new SAVIEROperator("dummyOperator")
-            );
-
-            //Create the Dummy OP
-            TSWFNet eop = new DummyOP(nsteps);
-            Global.petriNet = eop;
-
-            //Dummy alert and alert response
-            OPTriggering alert = new OPTriggering(
-                    "dummyAlert",
-                    operation.getStartTime(),
-                    operation.getEndTime(),
-                    eop
-            );
-            OPResponse ar = new OPResponse(alert, operation);
-            
-            Pair<MarkingOld,Long> eval = null;
-            long startTime = System.nanoTime();
-            try {
-                //Evaluation
-                eval = Evaluation.basicAPFE(
-                        eop.createInitialMarking(Arrays.asList(ar)),
-                        alert,
-                        eop
-                );
-
-            } catch (InterruptedException ex) {
-                LOG.log(Level.SEVERE, null, ex);
+                // Generate Synthetic Log
+                SyntheticIndexedLog log = new SyntheticIndexedLog(logSize);
+                
+                // Run test
+                long startTime = System.nanoTime();
+                /**
+                 * Call the CC algorithm
+                 */
+                ConformanceFunction CCResult = null;
+                try {
+                    CCResult = Evaluation.completeCCTS(
+                        model, 
+                        log, 
+                        null, 
+                        model.createInitialMarking(new Long[]{0L})
+                    );
+                } catch (Exception e) {
+                    LOG.log(Level.SEVERE, "Error executing TSCC algorithm");
+                    e.printStackTrace();
+                    return;
+                }
+                long estimatedTime = System.nanoTime() - startTime;
+                time_results.put(new Pair<Integer,Integer>(ntasks,logSize), estimatedTime);
             }
-            long estimatedTime = System.nanoTime() - startTime;
-            time_results.add(new Pair<Integer,Long>(nsteps,estimatedTime));
-            
-            LOG.log(Level.INFO,
-            "-----------------ENDING PROCEDURE FOLLOWING EVALUATION [{0}], timeRange=[{1},{2}])---------------",
-            new Object[]{alert.getId(), alert.getTriggerTs(), alert.getEndTime()});
-            LOG.log(Level.INFO, "Last marking: {0}", eval.getKey());
-            LOG.log(Level.INFO, "Time spent: {0}", eval.getValue());
-            
-            /*
-            LOG.log(Level.INFO,
-                        "-----------------ENDING PROCEDURE FOLLOWING EVALUATION [{0}], timeRange=[{1},{2}])---------------",
-                        new Object[]{alert.getId(), alert.getTriggerTs(), alert.getEndTime()});
-                LOG.log(Level.INFO, "1- RIGHT ACTIONS: {0}", eval.getRightActions());
-
-                LOG.log(Level.INFO, "2- MISSING ACTIONS: {0}", eval.getMissingActions());
-                LOG.log(Level.INFO, "3- SEQUENTIAL MISMATCHES: {0}", eval.getSequentialMismatches());
-                LOG.log(Level.INFO, "4- OVERREACTIONS: {0}", eval.getOverreactions());
-                LOG.log(Level.INFO, "--------------------------------------------------");
-*/
         }
         
-        //Save performance results
-        // Finds the workbook instance for XLSX file
-        XSSFWorkbook wb = new XSSFWorkbook();
-        String sheetName = "Sheet1";//name of sheet
-        XSSFSheet sheet = wb.createSheet(sheetName);
+        // Save the results in a CSV file
+        File file = new File("/home/victor/foo.csv");
+        CsvWriter csvWriter = new CsvWriter();
+        Collection<String[]> data = time_results.entrySet().stream()
+                .map((Entry<Pair<Integer, Integer>, Long> e) -> { 
+                    String[] ss = new String[]{
+                        e.getKey().getKey().toString(),
+                        e.getKey().getValue().toString(),
+                        e.getValue().toString()
+                    };
+                    return ss;
+                })
+                .collect(Collectors.toList());
         
-        //colnames
-        XSSFRow row;
-        row = sheet.createRow(0);
-            XSSFCell cell;
-            cell = row.createCell(0);cell.setCellValue("logsize");
-            cell = row.createCell(1);cell.setCellValue("nsteps");
-            cell = row.createCell(2);cell.setCellValue("time");
-        
-        //iterating r number of rows
-        for (int r=0;r < time_results.size(); r++ )
-        {
-                row = sheet.createRow(r+1);
-                cell = row.createCell(0);cell.setCellValue(logsize);
-                cell = row.createCell(1);cell.setCellValue(time_results.get(r).getKey());
-                cell = row.createCell(2);cell.setCellValue(time_results.get(r).getValue());
+        try {
+            csvWriter.write(file, StandardCharsets.UTF_8, data);
+        } catch (IOException ex) {
+            Logger.getLogger(TSCC_Scalability.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        FileOutputStream fos = new FileOutputStream(output_file_path);
-        //write this workbook to an Outputstream.
-        wb.write(fos);
-        fos.flush();
-        fos.close();
+        return;
     }
     
 }
