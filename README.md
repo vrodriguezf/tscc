@@ -117,3 +117,22 @@ to check several variables at once, a `ComposedTSG` (e.g., `AND`) should be used
 7. Now you can use the PNML model as an argument of the call to the TSCC algorithm 
 (See the *Execution* section of this README). If there is any error in the code of
 any of the TSGs, they will be prompted when executing the algorithm.
+
+## Synthetic models and scalability test
+
+An empirical study of how the computational time of the proposed algorithm varies 
+in terms of the size of the process model and the size of the log can be found 
+in the file `org.uam.aida.tascc.examples.TSCC_Scalability`. Algorithm 4 from the
+manuscript was run using, on the one hand, synthetic process models with a number 
+of tasks ranging from 4 to 200, all of them with trivial ts-guards (they always 
+return true), and on the other hand, univariate time series logs of different 
+size, ranging from 100 to 10000 records:
+
+![asd](https://i.imgur.com/ssLuWNd.png)
+
+As it can be seen in the above figure, the computational time does not seem to 
+be linear with respect to the number of procedural steps (tasks). However, it is 
+remarkable that, regardless the log size, the computational time is stable for 
+process models with less than 100 tasks, which are the most common in realistic 
+environments. This experiment has been run on a machine with a Intel Core 
+i5-4670K 3.4GHz (4 cores), 8GB RAM, running Windows 10 x64 and Java 1.8.

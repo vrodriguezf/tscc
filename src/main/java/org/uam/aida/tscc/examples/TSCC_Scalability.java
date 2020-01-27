@@ -35,7 +35,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  *
  * @author victor
  */
-public class APFE_Scalability {
+public class TSCC_Scalability {
     
     private static final Logger LOG = Logger.getLogger(SAVIERIntegration.class.getName());
 
