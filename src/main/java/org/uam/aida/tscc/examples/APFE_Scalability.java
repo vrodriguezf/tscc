@@ -45,7 +45,7 @@ public class APFE_Scalability {
     public static void main(String[] args) throws FileNotFoundException, IOException {
                 
         if (args.length == 0 || args.length > 4) {
-            LOG.log(Level.SEVERE, "Argument mismatch. Re-execute the program with the corret arguments");
+            LOG.log(Level.SEVERE, "Argument mismatch. Re-execute the program with the correct arguments");
         }
         String input_file_path = args[0];
         Integer min_nsteps = Integer.valueOf(args[1]);
