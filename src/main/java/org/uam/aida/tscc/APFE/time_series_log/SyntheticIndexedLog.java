@@ -17,24 +17,28 @@ import java.util.TreeMap;
 public class SyntheticIndexedLog extends IndexedTSLog {
 
     /**
-     * Add incrementally records in the log, with just one variable
+     * Add incrementally records in the log, with just one constant variable
      * @param logSize
      */
-    public SyntheticIndexedLog(Integer logSize) {
+    public SyntheticIndexedLog(Long logSize, String varName, Double varValue) {
         super("Synthetic", Collections.EMPTY_LIST);
         this.logSize = logSize;
         
         NavigableMap<Long, LogEntry> ts = new TreeMap<>();
         for (int i = 0; i < logSize; i++) {
             ts.put(Long.valueOf((long) i),
-                    new LogEntry(Long.valueOf((long) i), 666));
+                    new LogEntry(Long.valueOf((long) i), varValue));
         }
-        this.getIndexedEntries().put("V", ts);
+        this.getIndexedEntries().put(varName, ts);
+    }
+    
+    public SyntheticIndexedLog(Long logSize) {
+        this(logSize, "V", 0.0);
     }
 
-    public Integer getLogSize() {
+    public Long getLogSize() {
         return logSize;
     }
     
-    private final Integer logSize;
+    private final Long logSize;
 }

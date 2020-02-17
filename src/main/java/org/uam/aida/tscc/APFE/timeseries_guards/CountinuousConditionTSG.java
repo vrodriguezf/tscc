@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.NavigableMap;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import one.util.streamex.LongStreamEx;
 import org.uam.aida.tscc.APFE.time_series_log.IndexedTSLog;
@@ -215,6 +217,7 @@ public abstract class CountinuousConditionTSG extends UnivariateTSG {
         } else if (cachedResult != null) {
             result = cachedResult;
         } else {
+            LOG.log(Level.INFO, this.getGranularity().toString());
             NavigableMap<Long, LogEntry> tsWithGranularity
                     = LongStreamEx.iterate(timeSeries.firstKey(), l -> l + this.getGranularity())
                             .takeWhile(l -> l <= timeSeries.lastKey())
@@ -237,6 +240,7 @@ public abstract class CountinuousConditionTSG extends UnivariateTSG {
 
         return result;
     }
+    private static final Logger LOG = Logger.getLogger(CountinuousConditionTSG.class.getName());
 
     /**
      * Private things

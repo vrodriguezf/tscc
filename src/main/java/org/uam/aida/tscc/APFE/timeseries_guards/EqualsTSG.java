@@ -25,7 +25,10 @@ public class EqualsTSG extends NumericalComparisonTSG {
     
     @Override
     public boolean isComparisonFulfilled(Double timeSeriesRecord, Double value) {
-        throw new UnsupportedOperationException("Not implemented yet!");
+        
+        return (this.isStrict()
+                ? (timeSeriesRecord - value) == 0.0
+                : (timeSeriesRecord - value) >= (-1 * this.getEpsilon()));
     }
     
 }

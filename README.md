@@ -121,21 +121,25 @@ any of the TSGs, they will be prompted when executing the algorithm.
 ## Synthetic models and scalability test
 
 An empirical study of how the computational time of the proposed algorithm varies 
-in terms of the size of the process model and the size of the log can be found 
-in the file `org.uam.aida.tascc.examples.TSCC_Scalability`. Algorithm 4 from the
+in terms of the size of the process model and the complexity of the time series
+guards can be found in the file `org.uam.aida.tscc.examples.TSCC_Scalability`. Algorithm 4 from the
 manuscript was run using, on the one hand, synthetic process models with a number 
-of tasks ranging from 4 to 200, all of them with trivial ts-guards (they always 
-return true), and on the other hand, univariate time series logs of different 
-size, ranging from 100 to 10000 records:
+of tasks ranging from 5 to 500, and on the other hand, time series guards whose 
+fulfillment requires checking a number of records ranking from 10 to 1000. For 
+each iteration of the scalability test, all the transitions in the model have the 
+same time series guard, namely an instance of `EqualsTSG`, which checks that any 
+record in the log is equal to 0. The log is created synthetically, with one variable and
+with a size according to the number of tasks and the load of the time series guards.
+The time scope of each transition is adjusted to the size of the log in each iteration of the test.
 
 ![asd](https://i.imgur.com/ssLuWNd.png)
 
 As it can be seen in the above figure, the computational time does not seem to 
 be linear with respect to the number of procedural steps (tasks). However, it is 
-remarkable that, regardless the log size, the computational time is stable for 
-process models with less than 100 tasks, which are the most common in realistic 
+remarkable that, regardless the load of the time series guards, the computational 
+time is stable for process models with less than 100 tasks, which are the most common in realistic 
 environments. This experiment has been run on a machine with a Intel Core 
-i5-4670K 3.4GHz (4 cores), 8GB RAM, running Windows 10 x64 and Java 1.8.
+i7-6500U CPU @ 2.50 GHz (4 cores), 16GB RAM, running Ubuntu 18.04 x64 and Java 1.8.
 
 To run an scalability experiment, following the steps below:
 
@@ -145,25 +149,24 @@ To run an scalability experiment, following the steps below:
 3. In the project properties window, go to `Build->Run` and select the configuration
 `Scalability` on the drop-down menu.
 4. Specify the arguments you want for the scalability test:
-    1. Minimum size of the synthetic log.
-    2. Step in the definition of the log size for the creation of 
-        subsequent synthetic logs.
-    3. Maximum size of the synthetic log.
+    1. Minimum load of the time series guards, defined in terms of number of log records.
+    2. Step in the definition of the TSG load.
+    3. Maximum load of the time series guards.
     4. Minimum number of tasks to create in the synthetic process model.
     5. Step in the definition of the number of tasks for the creation of 
         subsequent synthetic process model.
     6. Maximum number of tasks to create the synthetic process model.
     7. Output file path (`CSV` file).
 
-As an example, with the arguments `10000 10000 100000 5 5 500`, the program will
-run the algorithm first with a log of 10000 records and a process model of 5 tasks,
-next with a log of 10000 records and a process model of 10 tasks, and it will end
-after some iterations running the algorithm against a log of 100000 records and 
-500 tasks.
+As an example, with the arguments `100 100 1000 5 5 500`, the program will
+run the algorithm first with a TSG load of 100 records and a process model of 5 tasks,
+next with a TSG load of 100 records and a process model of 10 tasks, and it will end
+after some iterations running the algorithm with a TSG load of 1000 records and a 
+process model of  500 tasks.
 
 The output file will contain 3 columns with no names:
-1. Log size.
-2. Number of tasks in the process model.
+1. Number of tasks in the process model.
+2. TSG load.
 3. Computational time.
 
 That information can be used to plot figures such as the one shown above.

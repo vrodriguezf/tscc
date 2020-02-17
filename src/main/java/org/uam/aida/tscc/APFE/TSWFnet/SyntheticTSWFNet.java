@@ -6,20 +6,13 @@
 package org.uam.aida.tscc.APFE.TSWFnet;
 
 import com.google.common.collect.Range;
-import org.uam.aida.tscc.APFE.OPResponse;
-import org.uam.aida.tscc.SAVIER_integration.tsg.SAVIERTimedConditions;
-import static org.uam.aida.tscc.APFE.utils.Maps.entriesToMap;
-import static org.uam.aida.tscc.APFE.utils.Maps.entry;
-import org.uam.aida.tscc.APFE.utils.Triple;
 import org.uam.aida.tscc.business.InputArc;
 import org.uam.aida.tscc.business.OutputArc;
 import org.uam.aida.tscc.business.Place;
 import org.uam.aida.tscc.business.Token;
 import org.uam.aida.tscc.business.TokenSet;
 import org.uam.aida.tscc.business.Transition;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.stream.Stream;
+import org.uam.aida.tscc.APFE.timeseries_guards.TSG;
 import org.uam.aida.tscc.APFE.timeseries_guards.TrivialTSG;
 
 /**
@@ -29,7 +22,7 @@ import org.uam.aida.tscc.APFE.timeseries_guards.TrivialTSG;
  */
 public class SyntheticTSWFNet extends TSWFNet {
 
-    public SyntheticTSWFNet(Integer nsteps) {
+    public SyntheticTSWFNet(Integer nsteps, TSG tsg) {
         int id_counter = 0;
         
         setId("SyntheticTSWFNet");
@@ -68,7 +61,7 @@ public class SyntheticTSWFNet extends TSWFNet {
             };
             t.setLabel("Task " + id_counter);
             t.setTimeScope(Range.closed(0L, 10000L));
-            t.setGuardCondition(new TrivialTSG());
+            t.setGuardCondition(tsg);
             ia = new InputArc(p, t) {
                 public boolean evaluate() {
                     return getTokenSet().size() > 0;
@@ -92,5 +85,9 @@ public class SyntheticTSWFNet extends TSWFNet {
                 return new TokenSet(currentCase.getObject(), currentCase.getTimestamp());
             }
         });
+    }
+    
+    public SyntheticTSWFNet(Integer nsteps) {
+        this(nsteps, new TrivialTSG());
     }
 }
