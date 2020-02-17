@@ -1,7 +1,7 @@
 # tscc
 Source code for the Time Series aware Conformance Checking (TSCC) algorithm, 
 described in the article "Conformance checking for time series aware processes", 
-submitted to IEEE Transactions on Industrial Informatics. 
+accepted in IEEE Transactions on Industrial Informatics. 
 
 ## Requisites
 This project is based on [Maven](https://maven.apache.org/), and it is written
