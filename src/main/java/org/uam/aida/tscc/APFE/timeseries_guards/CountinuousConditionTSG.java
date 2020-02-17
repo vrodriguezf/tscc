@@ -208,7 +208,9 @@ public abstract class CountinuousConditionTSG extends UnivariateTSG {
         NavigableMap<Long, LogEntry> result;
         NavigableMap<Long, LogEntry> cachedResult = granularityCache.get(timeSeries);
 
-        if (timeSeries.isEmpty()) {
+        if (timeSeries == null) {
+            result = new TreeMap<Long, LogEntry>();
+        } else if (timeSeries.isEmpty()) {
             result = timeSeries;
         } else if (cachedResult != null) {
             result = cachedResult;
