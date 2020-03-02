@@ -174,3 +174,7 @@ That information can be used to plot figures such as the one shown above.
 NOTE: In case one wants to modify the way the synthetic models/logs are created, the
 corresponding Java classes are `org.uam.aida.tscc.APFE.time_series_log.SyntheticIndexedLog` and
 `org.uam.aida.tscc.APFE.TSWFnet`.
+
+## Complete table of time series guard shown in the paper (Table I)
+
+![asd](https://i.imgur.com/gLa1ls1.png)
